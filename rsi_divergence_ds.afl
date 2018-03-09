@@ -1,0 +1,68 @@
+_SECTION_BEGIN("RSI Divergence");
+Title ="RSI Divergence" ;
+GraphXSpace=7;
+
+// user parameters 
+ZigZagReverse = Param("ZigZag reverse %", 10, 0, 100, 1);
+RsiRange = Param("RSI range", 14, 1, 200, 1);
+// end user parameters
+
+// indicator specific
+IndicatorValues = RSI(RsiRange);
+// end indicator specific
+
+function Divrg(Price, Indicator, ZigZagParam)
+{
+	ZigZags = Zig(Indicator, ZigZagParam);
+	Peaks = Peak(Indicator, ZigZagParam, 1);
+	Troughs = Trough(Indicator, ZigZagParam, 1);
+	ExtremumCounterPeaks = 0;
+	ExtremumCounterTroughs = 0;
+	ZigzagExtremumsPeaks[0] = ZigZags[0];
+	ZigzagExtremumsTroughs[0] = ZigZags[0];
+	PriceExtremumsPeaks[0] = Price[0];
+	PriceExtremumsTroughs[0] = Price[0];
+	
+	Ret = 0;
+	for (i = 0; i < BarCount; i++)
+	{
+		if(ZigZags[i] == Peaks[i])
+		{
+			ExtremumCounterPeaks++;
+			ZigzagExtremumsPeaks[ExtremumCounterPeaks] = ZigZags[i];
+			PriceExtremumsPeaks[ExtremumCounterPeaks] = Price[i];
+			if(PriceExtremumsPeaks[ExtremumCounterPeaks] > PriceExtremumsPeaks[ExtremumCounterPeaks-1] AND ZigzagExtremumsPeaks[ExtremumCounterPeaks] < ZigzagExtremumsPeaks[ExtremumCounterPeaks-1]) // bearish divergence 
+			{
+				Ret[i] = -1;
+				continue;
+			}
+		}
+		
+		if(ZigZags[i] == Troughs[i])
+		{
+			ExtremumCounterTroughs++;
+			ZigzagExtremumsTroughs[ExtremumCounterTroughs] = ZigZags[i];
+			PriceExtremumsTroughs[ExtremumCounterTroughs] = Price[i];
+			if(PriceExtremumsTroughs[ExtremumCounterTroughs] < PriceExtremumsTroughs[ExtremumCounterTroughs-1] AND ZigzagExtremumsTroughs[ExtremumCounterTroughs] > ZigzagExtremumsTroughs[ExtremumCounterTroughs-1]) // bullish divergence
+			{
+				Ret[i] = 1;
+				continue;
+			}
+		}
+		
+		Ret[i] = 0;
+	}
+	
+	return Ret;
+}
+
+IndicatorZigZags = Zig(IndicatorValues, ZigZagReverse);
+Plot(IndicatorZigZags, "Indicator ZigZags", colorLightOrange);
+PlotShapes( IIf(Divrg(C, IndicatorValues, ZigZagReverse) == 1, shapeUpTriangle, shapeNone), colorBrightGreen, 0, IndicatorZigZags, 0);
+PlotShapes ( IIf(Divrg(C, IndicatorValues, ZigZagReverse) == -1, shapeDownTriangle, shapeNone), colorRed, 0 , IndicatorZigZags, 0);
+_SECTION_END();
+
+_SECTION_BEGIN("RSI");
+SetChartOptions(0, 0, chartGrid30|chartGrid70);
+Plot(vrsi = RSI(RsiRange), "RSI", colorViolet);
+_SECTION_END();
