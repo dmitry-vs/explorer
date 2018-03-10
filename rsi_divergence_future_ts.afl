@@ -1,0 +1,64 @@
+#include_once ".\\Formulas\\Custom\\ds\\divrg.afl"
+
+// user parameters 
+rsiRange = 14;
+zigzagReverse = 14;
+stopLossPercent = 4;
+brokerCommissionMode = 1;  // 1 - percent of trade mode
+brokerCommissionAmount = 0.0354; // Finam broker commission for example
+positionQuantity = 7;
+liquidityMinLimit = 1000000;
+
+// indicator specific
+indicatorName = "RSI";
+indicatorValues = RSI(rsiRange);
+
+/* variables for optimizer, comment in and out necessary lines to choose what to optimize and not optimize */
+stopLossPercentOptimized = stopLossPercent;
+positionQuantityOptimized = positionQuantity; 
+zigzagReverseOptimized = zigzagReverse;
+//stopLossPercentOptimized = Optimize("StopLossPercent", stopLossPercent, 1, 15, 1);
+//positionQuantityOptimized = Optimize("MaxPositions", positionQuantity, 1, 10, 1); 
+//zigzagReverseOptimized = Optimize("ZzReverse", zigzagReverse, 2, 25, 1);
+
+// find divergencies
+indicatorZigZags = Zig(indicatorValues, zigzagReverseOptimized);
+divrgs = Divrg(Close, indicatorValues, zigzagReverseOptimized);
+
+// plot results on chart
+title = indicatorName + " divergence";
+_SECTION_BEGIN(indicatorName);
+SetChartOptions(0, 0, chartGrid30|chartGrid70);
+Plot(indicatorValues, indicatorName, colorViolet);
+Plot(30,"", colorLightGrey, styleLine|styleNoLabel);
+Plot(50,"", colorLightGrey, styleLine|styleNoLabel);
+Plot(70,"", colorLightGrey, styleLine|styleNoLabel);
+_SECTION_END();
+
+_SECTION_BEGIN(title);
+graphXSpace = 7;
+Plot(indicatorZigZags, "Indicator zigZags", colorLightOrange);
+PlotShapes(IIf(divrgs == 1, shapeUpTriangle, shapeNone), colorBrightGreen, 0, indicatorZigZags, 0);
+PlotShapes(IIf(divrgs == -1, shapeDownTriangle, shapeNone), colorRed, 0 , indicatorZigZags, 0);
+_SECTION_END();
+
+// set portfolio options
+SetOption("MaxOpenPositions", positionQuantityOptimized);
+SetPositionSize(100 / positionQuantityOptimized, spsPercentOfEquity);
+
+// buy-sell or short-cover on the second day after divrg signal
+SetTradeDelays(1, 1, 1, 1);
+Buy = Sell = Short = Cover = 0;
+BuyPrice = ShortPrice = Open;
+SellPrice = CoverPrice = Close;
+liquidity = MA(Close * Volume, 21);
+Buy = Sell = IIf(Ref(divrgs, -1) == 1 AND liquidity >= liquidityMinLimit, 1, 0);
+Short = Cover = IIf(Ref(divrgs, -1) == -1 AND liquidity >= liquidityMinLimit, 1, 0);
+
+// set intraday stop loss
+SetOption("ActivateStopsImmediately", True);
+ApplyStop(stopTypeLoss, stopModePercent, stopLossPercentOptimized, 1); // 1 - exit intraday
+
+// set commissions
+SetOption("CommissionMode", brokerCommissionMode);
+SetOption("CommissionAmount", brokerCommissionAmount);

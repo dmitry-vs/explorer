@@ -1,0 +1,30 @@
+#include_once ".\\Formulas\\Custom\\ds\\divrg.afl"
+
+// user parameters 
+rsiRange = Param("RSI range", 14, 1, 200, 1);
+zigzagReverse = Param("ZigZag reverse %", 14, 0, 100, 1);
+
+// indicator specific
+indicatorName = "RSI";
+indicatorValues = RSI(rsiRange);
+
+// find divergencies
+indicatorZigZags = Zig(indicatorValues, zigzagReverse);
+divrgs = Divrg(Close, indicatorValues, zigzagReverse);
+
+// plot results on chart
+_SECTION_BEGIN(indicatorName);
+SetChartOptions(0, 0, chartGrid30|chartGrid70);
+Plot(vrsi = RSI(rsiRange), "RSI", colorViolet);
+Plot(30,"", colorLightGrey, styleLine|styleNoLabel);
+Plot(50,"", colorLightGrey, styleLine|styleNoLabel);
+Plot(70,"", colorLightGrey, styleLine|styleNoLabel);
+_SECTION_END();
+
+title = indicatorName + " divergence";
+_SECTION_BEGIN(title);
+graphXSpace = 7;
+Plot(indicatorZigZags, "Indicator zigZags", colorLightOrange);
+PlotShapes(IIf(Divrg(Close, indicatorValues, zigzagReverse) == 1, shapeUpTriangle, shapeNone), colorBrightGreen, 0, indicatorZigZags, 0);
+PlotShapes(IIf(Divrg(Close, indicatorValues, zigzagReverse) == -1, shapeDownTriangle, shapeNone), colorRed, 0 , indicatorZigZags, 0);
+_SECTION_END();
