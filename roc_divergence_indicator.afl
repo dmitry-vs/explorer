@@ -1,23 +1,18 @@
 #include_once ".\\Formulas\\Custom\\divergence_ds\\divrg.afl"
 
-_SECTION_BEGIN("RSI");
-// user parameters 
-rsiRange = Param("RSI range", 14, 1, 200, 1);
-// end user parameters
-SetChartOptions(0, 0, chartGrid30|chartGrid70);
-Plot(vrsi = RSI(rsiRange), "RSI", colorViolet);
-Plot(30,"", colorLightGrey, styleLine|styleNoLabel);
-Plot(50,"", colorLightGrey, styleLine|styleNoLabel);
-Plot(70,"", colorLightGrey, styleLine|styleNoLabel);
+_SECTION_BEGIN("ROC");
+P = ParamField( "Price field" );
+periods = Param("Periods", 15, 1, 200, 1 );
+Plot(rocValues = ROC( P, periods), _DEFAULT_NAME(), ParamColor( "Color", colorCycle ), ParamStyle("Style"));
 _SECTION_END();
 
-_SECTION_BEGIN("RSI divergence");
+_SECTION_BEGIN("ROC divergence");
 // user parameters
-zigzagReverse = Param("ZigZag reverse %", 10, 0, 100, 1);
+zigzagReverse = Param("ZigZag reverse %", 60, 0, 100, 1);
 // end user parameters
 // indicator specific
-title = "RSI divergence";
-indicatorValues = RSI(rsiRange);
+title = "ROC divergence";
+indicatorValues = rocValues;
 // end indicator specific
 graphXSpace = 7;
 indicatorzigZags = Zig(indicatorValues, zigzagReverse);
@@ -25,5 +20,3 @@ Plot(indicatorzigZags, "Indicator zigZags", colorLightOrange);
 PlotShapes(IIf(Divrg(Close, indicatorValues, zigzagReverse) == 1, shapeUpTriangle, shapeNone), colorBrightGreen, 0, indicatorzigZags, 0);
 PlotShapes(IIf(Divrg(Close, indicatorValues, zigzagReverse) == -1, shapeDownTriangle, shapeNone), colorRed, 0 , indicatorzigZags, 0);
 _SECTION_END();
-
-

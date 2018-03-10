@@ -1,0 +1,72 @@
+_SECTION_BEGIN("MACD");
+// user parameters
+r1 = Param( "Fast avg", 12, 2, 200, 1 );
+r2 = Param( "Slow avg", 26, 2, 200, 1 );
+r3 = Param( "Signal avg", 9, 2, 200, 1 );
+// end user parameters
+Plot( ml = MACD(r1, r2), StrFormat(_SECTION_NAME()+"(%g,%g)", r1, r2), ParamColor("MACD color", colorRed ), ParamStyle("MACD style") );
+Plot( sl = Signal(r1,r2,r3), "Signal" + _PARAM_VALUES(), ParamColor("Signal color", colorBlue ), ParamStyle("Signal style") );
+Plot( ml-sl, "MACD Histogram", ParamColor("Histogram color", colorDefault ), styleNoTitle | ParamStyle("Histogram style", styleHistogram | styleNoLabel, maskHistogram ) );
+_SECTION_END();
+
+_SECTION_BEGIN("MACD Divergence");
+// user parameters
+zigzagReverse = Param("ZigZag reverse %", 10, 0, 100, 1);
+// end user parameters
+// indicator specific
+title = "MACD Divergence";
+indicatorValues = (ml - sl);
+// end indicator specific
+graphXSpace = 7;
+
+function Divrg(price, indicator, zigzagParam)
+{
+	zigZags = Zig(indicator, zigzagParam);
+	peaks = Peak(indicator, zigzagParam, 1);
+	troughs = Trough(indicator, zigzagParam, 1);
+	peaksCounter = 0;
+	troughsCounter = 0;
+	zigzagPeaks[0] = zigZags[0];
+	zigzagTroughs[0] = zigZags[0];
+	priceAtPeaks[0] = price[0];
+	priceAtTroughs[0] = price[0];
+	
+	ret = 0;
+	for (i = 0; i < BarCount; i++)
+	{
+		if(zigZags[i] == peaks[i])
+		{
+			peaksCounter++;
+			zigzagPeaks[peaksCounter] = zigZags[i];
+			priceAtPeaks[peaksCounter] = price[i];
+			if(priceAtPeaks[peaksCounter] > priceAtPeaks[peaksCounter-1] AND zigzagPeaks[peaksCounter] < zigzagPeaks[peaksCounter-1]) // bearish divergence 
+			{
+				ret[i] = -1;
+				continue;
+			}
+		}
+		
+		if(zigZags[i] == troughs[i])
+		{
+			troughsCounter++;
+			zigzagTroughs[troughsCounter] = zigZags[i];
+			priceAtTroughs[troughsCounter] = price[i];
+			if(priceAtTroughs[troughsCounter] < priceAtTroughs[troughsCounter-1] AND zigzagTroughs[troughsCounter] > zigzagTroughs[troughsCounter-1]) // bullish divergence
+			{
+				ret[i] = 1;
+				continue;
+			}
+		}
+		
+		ret[i] = 0;
+	}
+	
+	return ret;
+}
+
+indicatorzigZags = Zig(indicatorValues, zigzagReverse);
+Plot(indicatorzigZags, "Indicator zigZags", colorLightOrange);
+PlotShapes(IIf(Divrg(C, indicatorValues, zigzagReverse) == 1, shapeUpTriangle, shapeNone), colorBrightGreen, 0, indicatorzigZags, 0);
+PlotShapes(IIf(Divrg(C, indicatorValues, zigzagReverse) == -1, shapeDownTriangle, shapeNone), colorRed, 0 , indicatorzigZags, 0);
+_SECTION_END();
+
