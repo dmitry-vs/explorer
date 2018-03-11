@@ -2,7 +2,7 @@
 
 // user parameters 
 rsiRange = 14;
-zigzagReverse = 14;
+zigzagReverse = 12;
 stopLossPercent = 4;
 brokerCommissionMode = 1;  // 1 - percent of trade mode
 brokerCommissionAmount = 0.0354; // Finam broker commission for example
@@ -26,7 +26,7 @@ indicatorZigZags = Zig(indicatorValues, zigzagReverseOptimized);
 divrgs = Divrg(Close, indicatorValues, zigzagReverseOptimized);
 
 // plot results on chart
-title = indicatorName + " divergence";
+Title = indicatorName + " divergence";
 _SECTION_BEGIN(indicatorName);
 SetChartOptions(0, 0, chartGrid30|chartGrid70);
 Plot(indicatorValues, indicatorName, colorViolet);
@@ -35,7 +35,7 @@ Plot(50,"", colorLightGrey, styleLine|styleNoLabel);
 Plot(70,"", colorLightGrey, styleLine|styleNoLabel);
 _SECTION_END();
 
-_SECTION_BEGIN(title);
+_SECTION_BEGIN(Title);
 graphXSpace = 7;
 Plot(indicatorZigZags, "Indicator zigZags", colorLightOrange);
 PlotShapes(IIf(divrgs == 1, shapeUpTriangle, shapeNone), colorBrightGreen, 0, indicatorZigZags, 0);

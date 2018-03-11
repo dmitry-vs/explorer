@@ -1,0 +1,43 @@
+#include_once ".\\Formulas\\Custom\\ds\\divrg.afl"
+
+// user parameters
+liquidityMinLimit = 1000000;
+rsiRange = 14;
+zigzagReverse = 12;
+
+// filter by liquidity
+liquidity = MA(Close * Volume, 21);
+Filter = liquidity >= liquidityMinLimit;
+
+// show tickers with 4-week high and 4-week low price
+daysInFourWeeks = 28;
+fourWeeksPriceExtremum = 0;
+fourWeeksPriceExtremum = IIf(High >= HHV(High, daysInFourWeeks), 1, fourWeeksPriceExtremum);
+fourWeeksPriceExtremum = IIf(Low <= LLV(Low, daysInFourWeeks), -1, fourWeeksPriceExtremum);
+AddColumn(fourWeeksPriceExtremum, "4w Price Ext", 1.0);
+
+// show tickers with 4-week high and 4-week low volume
+fourWeeksVolumeExtremum = 0;
+fourWeeksVolumeExtremum = IIf(Volume >= HHV(Volume, daysInFourWeeks), 1, fourWeeksVolumeExtremum);
+fourWeeksVolumeExtremum = IIf(Volume <= LLV(Volume, daysInFourWeeks), -1, fourWeeksVolumeExtremum);
+AddColumn(fourWeeksVolumeExtremum, "4w Volume Ext", 1.0);
+
+// show tickers with all-time high and all-time low price
+allTimePriceExtremum = 0;
+allTimePriceExtremum = IIf(High >= Highest(High), 1, allTimePriceExtremum);
+allTimePriceExtremum = IIf(Low <= Lowest(Low), -1, allTimePriceExtremum);
+AddColumn(allTimePriceExtremum, "AllTime Price Ext", 1.0);
+
+// show tickers with all-time high and all-time low volume
+allTimeVolumeExtremum = 0;
+allTimeVolumeExtremum = IIf(Volume >= Highest(Volume), 1, allTimeVolumeExtremum);
+allTimeVolumeExtremum = IIf(Volume <= Lowest(Volume), -1, allTimeVolumeExtremum);
+AddColumn(allTimeVolumeExtremum, "AllTime Volume Ext", 1.0);
+
+// show tickers with RSI divergence
+indicatorName = "RSI";
+indicatorValues = RSI(rsiRange);
+indicatorZigZags = Zig(indicatorValues, zigzagReverse);
+divrgs = Divrg(Close, indicatorValues, zigzagReverse);
+AddColumn(divrgs, indicatorName + " Div", 1.0);
+

@@ -2,7 +2,7 @@
 
 // user parameters 
 rsiRange = Param("RSI range", 14, 1, 200, 1);
-zigzagReverse = Param("ZigZag reverse %", 14, 0, 100, 1);
+zigzagReverse = Param("ZigZag reverse %", 12, 0, 100, 1);
 
 // indicator specific
 indicatorName = "RSI";
@@ -21,8 +21,8 @@ Plot(50,"", colorLightGrey, styleLine|styleNoLabel);
 Plot(70,"", colorLightGrey, styleLine|styleNoLabel);
 _SECTION_END();
 
-title = indicatorName + " divergence";
-_SECTION_BEGIN(title);
+Title = indicatorName + " divergence";
+_SECTION_BEGIN(Title);
 graphXSpace = 7;
 Plot(indicatorZigZags, "Indicator zigZags", colorLightOrange);
 PlotShapes(IIf(Divrg(Close, indicatorValues, zigzagReverse) == 1, shapeUpTriangle, shapeNone), colorBrightGreen, 0, indicatorZigZags, 0);
