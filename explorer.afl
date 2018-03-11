@@ -4,6 +4,8 @@
 liquidityMinLimit = 1000000;
 rsiRange = 14;
 zigzagReverse = 12;
+fastMAPeriod = 5;
+slowMAPeriod = 10;
 
 // filter by liquidity
 liquidity = MA(Close * Volume, 21);
@@ -41,3 +43,10 @@ indicatorZigZags = Zig(indicatorValues, zigzagReverse);
 divrgs = Divrg(Close, indicatorValues, zigzagReverse);
 AddColumn(divrgs, indicatorName + " Div", 1.0);
 
+// show tickers with price between fast MA and slow MA
+fastMA = MA(Close, fastMAPeriod);
+slowMA = MA(Close, slowMAPeriod); 
+priceInValueArea = 0;
+priceInValueArea = IIf(Close >= slowMA AND Close <= fastMA, 1, priceInValueArea);
+priceInValueArea = IIf(Close <= slowMA AND Close >= fastMA, -1, priceInValueArea);
+AddColumn(priceInValueArea, "Price Between MA", 1.0);
