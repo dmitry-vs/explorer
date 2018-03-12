@@ -42,3 +42,22 @@ function Divrg(price, indicator, zigzagParam)
 	
 	return ret;
 }
+
+function LinesCross(line1, line2)
+{
+	ret = Cross(line1, line2) OR Cross(line2, line1);
+	return ret;
+}
+
+function TrendLineBreak(values, studyId, chartId)
+{
+	trendLine = Study(studyId, chartId);
+	return LinesCross(values, trendLine);
+}
+
+function TrendLineBreakPrice(studyId, chartId)
+{
+	ret = TrendLineBreak(Open, studyId, chartId) OR TrendLineBreak(High, studyId, chartId) 
+		OR TrendLineBreak(Low, studyId, chartId) OR TrendLineBreak(Close, studyId, chartId);
+	return ret;
+}

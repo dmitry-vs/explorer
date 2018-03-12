@@ -1,4 +1,4 @@
-#include_once ".\\Formulas\\Custom\\ds\\divrg.afl"
+#include_once ".\\Formulas\\Custom\\ds\\lib.afl"
 
 // user parameters 
 rsiRange = Param("RSI range", 14, 1, 200, 1);
