@@ -11,30 +11,30 @@ slowMAPeriod = 10;
 liquidity = MA(Close * Volume, 21);
 Filter = liquidity >= liquidityMinLimit;
 
-// show tickers with 4-week high and 4-week low price
-daysInFourWeeks = 28;
-fourWeeksPriceExtremum = 0;
-fourWeeksPriceExtremum = IIf(High >= HHV(High, daysInFourWeeks), 1, fourWeeksPriceExtremum);
-fourWeeksPriceExtremum = IIf(Low <= LLV(Low, daysInFourWeeks), -1, fourWeeksPriceExtremum);
-AddColumn(fourWeeksPriceExtremum, "4w Price Ext", 1.0);
+// show tickers with max and min price in selected set of bars
+bars = 28;
+barsPriceExtremum = 0;
+barsPriceExtremum = IIf(High >= HHV(High, bars), 1, barsPriceExtremum);
+barsPriceExtremum = IIf(Low <= LLV(Low, bars), -1, barsPriceExtremum);
+AddColumn(barsPriceExtremum, NumToStr(bars, 1.0) + " Bars Price", 1.0);
 
-// show tickers with 4-week high and 4-week low volume
-fourWeeksVolumeExtremum = 0;
-fourWeeksVolumeExtremum = IIf(Volume >= HHV(Volume, daysInFourWeeks), 1, fourWeeksVolumeExtremum);
-fourWeeksVolumeExtremum = IIf(Volume <= LLV(Volume, daysInFourWeeks), -1, fourWeeksVolumeExtremum);
-AddColumn(fourWeeksVolumeExtremum, "4w Volume Ext", 1.0);
+// show tickers with max and min volume in selected set of bars
+barsVolumeExtremum = 0;
+barsVolumeExtremum = IIf(Volume >= HHV(Volume, bars), 1, barsVolumeExtremum);
+barsVolumeExtremum = IIf(Volume <= LLV(Volume, bars), -1, barsVolumeExtremum);
+AddColumn(barsVolumeExtremum, NumToStr(bars, 1.0) + " Bars Vol", 1.0);
 
-// show tickers with all-time high and all-time low price
-allTimePriceExtremum = 0;
-allTimePriceExtremum = IIf(High >= Highest(High), 1, allTimePriceExtremum);
-allTimePriceExtremum = IIf(Low <= Lowest(Low), -1, allTimePriceExtremum);
-AddColumn(allTimePriceExtremum, "AllTime Price Ext", 1.0);
+// show tickers with max and min price in all bars
+allBarsPriceExtremum = 0;
+allBarsPriceExtremum = IIf(High >= Highest(High), 1, allBarsPriceExtremum);
+allBarsPriceExtremum = IIf(Low <= Lowest(Low), -1, allBarsPriceExtremum);
+AddColumn(allBarsPriceExtremum, "AllTime Price", 1.0);
 
-// show tickers with all-time high and all-time low volume
-allTimeVolumeExtremum = 0;
-allTimeVolumeExtremum = IIf(Volume >= Highest(Volume), 1, allTimeVolumeExtremum);
-allTimeVolumeExtremum = IIf(Volume <= Lowest(Volume), -1, allTimeVolumeExtremum);
-AddColumn(allTimeVolumeExtremum, "AllTime Volume Ext", 1.0);
+// show tickers with max and min volume in all bars
+allBarsVolumeExtremum = 0;
+allBarsVolumeExtremum = IIf(Volume >= Highest(Volume), 1, allBarsVolumeExtremum);
+allBarsVolumeExtremum = IIf(Volume <= Lowest(Volume), -1, allBarsVolumeExtremum);
+AddColumn(allBarsVolumeExtremum, "AllTime Volume", 1.0);
 
 // show tickers with RSI divergence
 indicatorName = "RSI";
@@ -52,7 +52,7 @@ priceInValueArea = IIf(Close <= slowMA AND Close >= fastMA, -1, priceInValueArea
 AddColumn(priceInValueArea, "Price Between MA", 1.0);
 
 // show tickers with trend line price breaks
-studyNames = "RE,SU,UP,DN,RI,ST";
+studyNames = "RE,SU,UP,DN,RI,ST,AA,AB,AC,AD,AE";
 chartId = 1;
 index = 0;
 priceBrokeTrendLine = 0;
