@@ -61,3 +61,13 @@ function TrendLineBreakPrice(studyId, chartId)
 		OR TrendLineBreak(Low, studyId, chartId) OR TrendLineBreak(Close, studyId, chartId);
 	return ret;
 }
+
+function ExplorerGetBckgColor(data)
+{
+	return IIf(data != 0, IIf(data > 0, colorPaleGreen, colorRose), colorDefault);
+}
+
+procedure ExplorerAddColumn(colName, colData)
+{
+	AddColumn(colData, colName, 1.0, colorDefault, ExplorerGetBckgColor(colData));
+}

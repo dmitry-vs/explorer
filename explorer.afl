@@ -16,32 +16,32 @@ bars = 28;
 barsPriceExtremum = 0;
 barsPriceExtremum = IIf(High >= HHV(High, bars), 1, barsPriceExtremum);
 barsPriceExtremum = IIf(Low <= LLV(Low, bars), -1, barsPriceExtremum);
-AddColumn(barsPriceExtremum, NumToStr(bars, 1.0) + " Bars Price", 1.0);
+ExplorerAddColumn(NumToStr(bars, 1.0) + " Bars Price", barsPriceExtremum);
 
 // show tickers with max and min volume in selected set of bars
 barsVolumeExtremum = 0;
 barsVolumeExtremum = IIf(Volume >= HHV(Volume, bars), 1, barsVolumeExtremum);
 barsVolumeExtremum = IIf(Volume <= LLV(Volume, bars), -1, barsVolumeExtremum);
-AddColumn(barsVolumeExtremum, NumToStr(bars, 1.0) + " Bars Vol", 1.0);
+ExplorerAddColumn(NumToStr(bars, 1.0) + " Bars Vol", barsVolumeExtremum);
 
 // show tickers with max and min price in all bars
 allBarsPriceExtremum = 0;
 allBarsPriceExtremum = IIf(High >= Highest(High), 1, allBarsPriceExtremum);
 allBarsPriceExtremum = IIf(Low <= Lowest(Low), -1, allBarsPriceExtremum);
-AddColumn(allBarsPriceExtremum, "AllTime Price", 1.0);
+ExplorerAddColumn("AllTime Price", allBarsPriceExtremum);
 
 // show tickers with max and min volume in all bars
 allBarsVolumeExtremum = 0;
 allBarsVolumeExtremum = IIf(Volume >= Highest(Volume), 1, allBarsVolumeExtremum);
 allBarsVolumeExtremum = IIf(Volume <= Lowest(Volume), -1, allBarsVolumeExtremum);
-AddColumn(allBarsVolumeExtremum, "AllTime Volume", 1.0);
+ExplorerAddColumn("AllTime Volume", allBarsVolumeExtremum);
 
 // show tickers with RSI divergence
 indicatorName = "RSI";
 indicatorValues = RSI(rsiRange);
 indicatorZigZags = Zig(indicatorValues, zigzagReverse);
 divrgs = Divrg(Close, indicatorValues, zigzagReverse);
-AddColumn(divrgs, indicatorName + " Div", 1.0);
+ExplorerAddColumn(indicatorName + " Div", divrgs);
 
 // show tickers with price between fast MA and slow MA
 fastMA = MA(Close, fastMAPeriod);
@@ -49,7 +49,7 @@ slowMA = MA(Close, slowMAPeriod);
 priceInValueArea = 0;
 priceInValueArea = IIf(Close >= slowMA AND Close <= fastMA, 1, priceInValueArea);
 priceInValueArea = IIf(Close <= slowMA AND Close >= fastMA, -1, priceInValueArea);
-AddColumn(priceInValueArea, "Price Between MA", 1.0);
+ExplorerAddColumn("Price Between MA", priceInValueArea);
 
 // show tickers with trend line price breaks
 studyNames = "RE,SU,UP,DN,RI,ST,AA,AB,AC,AD,AE";
@@ -61,4 +61,4 @@ while((studyName = StrExtract(studyNames, index)) != "")
 	priceBrokeTrendLine = priceBrokeTrendLine OR TrendLineBreakPrice(studyName, chartId);
 	index++;
 }
-AddColumn(priceBrokeTrendLine, "Price Break Trend", 1.0);
+ExplorerAddColumn("Price Break Trend", priceBrokeTrendLine);
