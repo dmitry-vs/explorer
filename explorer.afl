@@ -52,13 +52,14 @@ priceInValueArea = IIf(Close <= slowMA AND Close >= fastMA, -1, priceInValueArea
 ExplorerAddColumn("Price Between MA", priceInValueArea);
 
 // show tickers with trend line price breaks
-studyNames = "RE,SU,UP,DN,RI,ST,AA,AB,AC,AD,AE";
+studyNames = "SU,SA,SB,SC,SD,SE,SF,RA,RB,RC,RD,RE,RF,UP,DN,RI,ST";
 chartId = 1;
 index = 0;
 priceBrokeTrendLine = 0;
 while((studyName = StrExtract(studyNames, index)) != "")
 {
-	priceBrokeTrendLine = priceBrokeTrendLine OR TrendLineBreakPrice(studyName, chartId);
+	priceBrokeTrendLine = IIf(TrendLineBreakPrice(studyName, chartId) == 1, 1, priceBrokeTrendLine);
+	priceBrokeTrendLine = IIf(TrendLineBreakPrice(studyName, chartId) == -1, -1, priceBrokeTrendLine);
 	index++;
 }
 ExplorerAddColumn("Price Break Trend", priceBrokeTrendLine);
